@@ -1,0 +1,115 @@
+name: customer-support-env
+version: "1.0.0"
+description: >
+  A real-world customer-support ticket resolution environment.
+  An AI agent learns to create tickets, route them through a lifecycle workflow,
+  search a knowledge base, link relevant articles, and close resolved issues —
+  all via a typed REST API backed by a live FastAPI + SQLite service.
+
+base_url: http://localhost:7860
+
+endpoints:
+  reset: POST /reset
+  step:  POST /step
+  state: GET  /state
+
+tasks:
+  - id: create-ticket
+    name: Create Support Ticket
+    description: >
+      Create a high-quality support ticket with all required fields:
+      title (≥10 chars), description (≥20 chars), priority, and category.
+      Each dimension awards 0.25 reward; total episode score is 0.0–1.0.
+    difficulty: easy
+    max_steps: 10
+    reward_threshold: 0.5
+
+  - id: resolve-ticket
+    name: Resolve Support Ticket
+    description: >
+      A pre-existing open ticket is assigned to the agent. The agent must:
+      1) acknowledge with a comment, 2) move to in_progress, 3) add a resolution
+      comment, 4) move to resolved. Each stage awards 0.25 reward → max 1.0.
+    difficulty: medium
+    max_steps: 15
+    reward_threshold: 0.5
+
+  - id: full-workflow
+    name: Full Support Workflow
+    description: >
+      End-to-end workflow: create ticket → add comment → search KB →
+      link article → in_progress → resolved → closed.
+      Weighted partial rewards at each stage → max 1.0.
+    difficulty: hard
+    max_steps: 20
+    reward_threshold: 0.5
+
+observation_space:
+  type: object
+  required: [task, step, done, instructions, available_actions, state]
+  properties:
+    task:
+      type: string
+      description: Active task name
+    step:
+      type: integer
+      description: Current step number (0 = just reset)
+    done:
+      type: boolean
+      description: Whether the episode has ended
+    instructions:
+      type: string
+      description: Human-readable task instructions for the agent
+    available_actions:
+      type: array
+      items:
+        type: string
+      description: List of valid action signatures for this task
+    state:
+      type: object
+      description: Task-specific snapshot of the environment DB
+    last_action_result:
+      type: string
+      nullable: true
+      description: Human-readable result of the previous action (null on reset)
+
+action_space:
+  type: object
+  required: [action_type]
+  properties:
+    action_type:
+      type: string
+      enum:
+        - create_ticket
+        - add_comment
+        - update_status
+        - search_kb
+        - link_article
+        - noop
+    title:
+      type: string
+    description:
+      type: string
+    priority:
+      type: string
+      enum: [low, medium, high, urgent]
+    category:
+      type: string
+    ticket_id:
+      type: integer
+    status:
+      type: string
+      enum: [in_progress, resolved, closed]
+    body:
+      type: string
+    query:
+      type: string
+    article_id:
+      type: integer
+
+reward:
+  type: float
+  range: [0.0, 1.0]
+  description: >
+    Cumulative episode reward in [0, 1]. Partial progress signals are emitted
+    at each step so the agent receives feedback before the episode ends.
