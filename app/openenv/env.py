@@ -295,7 +295,7 @@ def _snapshot() -> dict[str, Any]:
             for aid in _state.kb_article_ids
         ]
         current_ticket = None
-        comments: list[dict] = []
+        ticket_comments: list[dict] = []
         linked: list[dict] = []
         if _state.ticket_id:
             t = db.query(Ticket).filter(Ticket.id == _state.ticket_id).first()
@@ -305,7 +305,7 @@ def _snapshot() -> dict[str, Any]:
                     "status": t.status, "priority": t.priority,
                     "category": t.category,
                 }
-                comments = [
+                ticket_comments = [
                     {"id": c.id, "body": c.body}
                     for c in db.query(Comment).filter(Comment.ticket_id == t.id).all()
                 ]
@@ -320,7 +320,7 @@ def _snapshot() -> dict[str, Any]:
                 for a in articles if a
             ],
             "current_ticket": current_ticket,
-            "ticket_comments": comments,
+            "ticket_comments": ticket_comments,
             "linked_articles": linked,
             "search_results": _state.search_results,
         }
@@ -540,6 +540,7 @@ def _exec_link_article(db: Session, action: ActionModel) -> tuple[float, str]:
 
 def _execute(action: ActionModel) -> tuple[float, Optional[str], Optional[str]]:
     """Dispatch action, return (reward, result_msg, error_msg)."""
+    import logging
     atype = action.action_type
     db = _new_session()
     try:
@@ -559,7 +560,10 @@ def _execute(action: ActionModel) -> tuple[float, Optional[str], Optional[str]]:
             return 0.0, None, f"Unknown action_type: '{atype}'"
         return r, msg, None
     except Exception as exc:  # noqa: BLE001
-        return 0.0, None, str(exc)
+        logging.getLogger(__name__).exception(
+            "Unhandled error executing action '%s': %s", atype, exc
+        )
+        return 0.0, None, f"{type(exc).__name__}: {exc}"
     finally:
         db.close()
 

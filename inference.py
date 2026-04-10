@@ -169,11 +169,14 @@ def _server_ready(http: httpx.Client) -> bool:
 
 def _start_local_server() -> Optional[subprocess.Popen]:  # type: ignore[type-arg]
     """Start uvicorn in the background if the server is not already running."""
+    log_path = os.path.join(os.path.dirname(__file__) or ".", "uvicorn_startup.log")
+    log_file = open(log_path, "w")  # noqa: WPS515 – intentional file handle
     proc = subprocess.Popen(  # noqa: S603, S607
         ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
+    print(f"[DEBUG] uvicorn started (pid={proc.pid}); logs → {log_path}", flush=True)
     return proc
 
 
