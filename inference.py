@@ -8,7 +8,7 @@ lines to stdout.
 Environment variables
 ─────────────────────
   API_BASE_URL   LLM inference endpoint  (default: HuggingFace router)
-  MODEL_NAME     Model identifier        (default: Qwen/Qwen2.5-72B-Instruct)
+  MODEL_NAME     Model identifier        (set via MODEL_NAME env var, required)
   HF_TOKEN       API key / HF token      (required for hosted inference)
   SERVER_URL     OpenEnv server base URL (default: http://localhost:7860)
   TASK           Run a single task instead of all three (optional)
@@ -35,7 +35,7 @@ from openai import OpenAI
 # ── Configuration ──────────────────────────────────────────────────────────────
 API_KEY: str = os.getenv("HF_TOKEN") or os.getenv("OPENAI_API_KEY") or os.getenv("API_KEY") or "dummy-key"
 API_BASE_URL: str = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
-MODEL_NAME: str = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
+MODEL_NAME: str = os.getenv("MODEL_NAME", "")
 SERVER_URL: str = os.getenv("SERVER_URL", "http://localhost:7860").rstrip("/")
 BENCHMARK: str = "customer-support-env"
 SINGLE_TASK: Optional[str] = os.getenv("TASK")  # optional: run just one task

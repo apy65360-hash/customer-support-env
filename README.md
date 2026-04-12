@@ -164,7 +164,7 @@ docker build -t customer-support-env .
 docker run -p 7860:7860 \
   -e HF_TOKEN=your-token \
   -e API_BASE_URL=https://router.huggingface.co/v1 \
-  -e MODEL_NAME=Qwen/Qwen2.5-72B-Instruct \
+  -e MODEL_NAME=your-model-name \
   customer-support-env
 ```
 
@@ -175,7 +175,7 @@ docker run -p 7860:7860 \
 | Variable | Default | Description |
 |---|---|---|
 | `API_BASE_URL` | `https://router.huggingface.co/v1` | LLM inference endpoint (OpenAI-compatible) |
-| `MODEL_NAME` | `Qwen/Qwen2.5-72B-Instruct` | Model identifier for inference |
+| `MODEL_NAME` | *(set via env var)* | Model identifier for inference |
 | `HF_TOKEN` | — | HuggingFace API key / token (required for inference) |
 | `SERVER_URL` | `http://localhost:7860` | OpenEnv server base URL used by inference.py |
 | `TASK` | *(all three)* | Run a single task instead of all three |
@@ -187,7 +187,7 @@ docker run -p 7860:7860 \
 
 ## Baseline Scores
 
-Baseline agent: **Qwen/Qwen2.5-72B-Instruct** via HuggingFace Inference Router  
+Baseline agent: HuggingFace Inference Router (set via `MODEL_NAME` env var)  
 Temperature: 0.3 | Max tokens per step: 300
 
 | Task | Difficulty | Score | Notes |
