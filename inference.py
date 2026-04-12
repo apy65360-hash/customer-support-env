@@ -33,7 +33,7 @@ import httpx
 from openai import OpenAI
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-API_KEY: str = os.getenv("HF_TOKEN") or os.getenv("API_KEY") or "dummy-key"
+API_KEY: str = os.getenv("HF_TOKEN") or os.getenv("OPENAI_API_KEY") or os.getenv("API_KEY") or "dummy-key"
 API_BASE_URL: str = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME: str = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 SERVER_URL: str = os.getenv("SERVER_URL", "http://localhost:7860").rstrip("/")
