@@ -1,4 +1,6 @@
 """FastAPI router exposing the OpenEnv API at /reset, /step, /state."""
+from typing import Optional
+
 from fastapi import APIRouter
 
 from .env import TASK_NAMES, do_reset, do_state, do_step
@@ -14,7 +16,7 @@ router = APIRouter(tags=["openenv"])
 
 
 @router.post("/reset", response_model=Observation, summary="Reset environment episode")
-def reset(body: ResetRequest = ResetRequest()) -> Observation:
+def reset(body: Optional[ResetRequest] = None) -> Observation:
     """Reset the environment to an initial state for the given task.
 
     - **task**: one of ``create-ticket``, ``resolve-ticket``, ``full-workflow``
@@ -22,6 +24,8 @@ def reset(body: ResetRequest = ResetRequest()) -> Observation:
 
     Returns the initial ``Observation``.
     """
+    if body is None:
+        body = ResetRequest()
     return do_reset(body.task)
 
 
