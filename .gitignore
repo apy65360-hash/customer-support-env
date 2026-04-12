@@ -1,0 +1,20 @@
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env.local
+
+# Virtual environments
+venv/
+.venv/
+
+# Pip corruption artifacts
+=*
